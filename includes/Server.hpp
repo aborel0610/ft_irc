@@ -7,6 +7,12 @@
 # include "Client.hpp"
 # include "Channel.hpp"
 # include <vector>
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <sys/types.h>
+# include <cstdlib>
+# include <fcntl.h>
+# include <poll.h>
 
 class Server
 {
@@ -16,13 +22,13 @@ private:
 	std::string _password;
 	std::map<int, Client> _clients;
 	std::map<std::string, Channel> _channels;
-	std::vector<int> _fds;
+	std::vector<pollfd> _fds;
 public:
 	Server(/* args */);
 	~Server();
 	void	run();
 	void	acceptClient();
-	void	recieveData();
+	void	receiveData();
 	void	sendtoClient();
 	void	broadcastToChannel();
 };
