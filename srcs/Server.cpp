@@ -15,24 +15,24 @@ void	Server::run()
 
 	//Create socket (interprocess communication)
 	//AF_INET = IPv4, SOCK_STREAM = TCP
-	int	sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock < 0)
+	_serverfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (_serverfd < 0)
 		throw(std::runtime_error("Error: socket()"));
 	
 	sockAddr.sin_family = AF_INET;
 	sockAddr.sin_port = htons(this->_port);
 	sockAddr.sin_addr.s_addr = INADDR_ANY; //accept connections on any IP
-	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1)
+	if (fcntl(_serverfd, F_SETFL, O_NONBLOCK) == -1)
 		throw(std::runtime_error("Error: O_NONBLOCK"));
-	if (bind(sock, (struct sockaddr*)&sockAddr, sizeof(sockAddr)) == -1)
+	if (bind(_serverfd, (struct sockaddr*)&sockAddr, sizeof(sockAddr)) == -1)
 		throw(std::runtime_error("Error: bind()"));
-	if (listen(sock, SOMAXCONN) == -1)
+	if (listen(_serverfd, SOMAXCONN) == -1)
 		throw(std::runtime_error("Error: listen()"));
 	
-	newPoll.fd = sock;
+	newPoll.fd = _serverfd;
 	newPoll.events = POLLIN;
 	this->_fds.push_back(newPoll);
-	std::cout << "Server " << sock << "connected. Listening...\n";
+	std::cout << "Server " << _serverfd << "connected. Listening...\n";
 
 	while (Server::signal == false)
 	{
@@ -42,7 +42,7 @@ void	Server::run()
 		{
 			if (_fds[i].revents & POLLIN)
 			{
-				if (_fds[i].fd == sock)
+				if (_fds[i].fd == _serverfd)
 					acceptClient();
 				else
 					receiveData(_fds[i].fd);
@@ -52,3 +52,38 @@ void	Server::run()
 	closeFds();
 }
 
+void	Server::acceptClient()
+{
+	Client c = Client();
+	struct sockaddr_in	cliAddr;
+	struct pollfd		newPoll;
+	socklen_t len = sizeof(cliAddr);
+
+	int sock = accept(_serverfd, (sockaddr *)&(cliAddr), &len);
+	if (sock < 0)
+		throw(std::runtime_error("Error: accept()"));
+	newPoll.fd = sock;
+	newPoll.events = POLLIN;
+	newPoll.revents = 0;
+	//c.setFd(sock);
+	_clients.insert(std::pair(sock, c));
+	_fds.push_back(newPoll);
+}
+
+void	Server::receiveData(int fd)
+{
+	char	buff[1024];
+	std::memset(buff, 0, sizeof(buff));
+	ssize_t bytes = recv(fd, buff, sizeof(buff) - 1, 0);
+
+	if (bytes <= 0)
+	{
+		std::cout << "Client <" << fd << "> Disconnected\n";
+		clearClient(fd);
+	}
+	else
+	{
+		buff[bytes] = 0;
+		//Process command here
+	}
+}

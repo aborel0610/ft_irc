@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include <string>
+# include <cstring>
 # include <iostream>
 # include <map>
 # include "Client.hpp"
@@ -40,6 +40,7 @@ public:
 	//Signal Handler + clean exit
 	static void	signalHandler(int signum);
 	void		closeFds();
+	void		clearClient(int fd);
 };
 
 Server::Server(/* args */)
