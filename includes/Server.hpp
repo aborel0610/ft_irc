@@ -17,20 +17,29 @@
 class Server
 {
 private:
-	int _serverfd;
-	int _port;
-	std::string _password;
-	std::map<int, Client> _clients;
-	std::map<std::string, Channel> _channels;
-	std::vector<pollfd> _fds;
+	int								_serverfd;
+	int								_port;
+	std::string						_password;
+	std::map<int, Client>			_clients;
+	std::map<std::string, Channel>	_channels;
+	std::vector<pollfd>				_fds;
+	static bool						signal;
 public:
+	// Constructors, destructor
 	Server(/* args */);
 	~Server();
+
+	//Member functions
+	void	init();
 	void	run();
 	void	acceptClient();
-	void	receiveData();
+	void	receiveData(int fd);
 	void	sendtoClient();
 	void	broadcastToChannel();
+
+	//Signal Handler + clean exit
+	static void	signalHandler(int signum);
+	void		closeFds();
 };
 
 Server::Server(/* args */)
