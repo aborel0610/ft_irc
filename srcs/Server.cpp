@@ -85,7 +85,44 @@ void	Server::receiveData(int fd)
 	{
 		buff[bytes] = 0;
 		t_message message = parse_message(buff);
-		//Check prefix is real
+
+		if (message.prefix[0] != 0)
+		{
+			std::map<int, Client>::iterator it;
+			for (it = _clients.begin(); it != _clients.end(); ++it)
+			{
+				if (it->second.getNick() == message.prefix)
+				{
+					message.fd = fd;
+					break;
+				}
+			}
+			if (it == _clients.end())
+			{
+				std::cout << "User not found\n";
+				return ;
+			}
+		}
+		else
+		{
+			message.fd = fd;
+			std::map<int, Client>::iterator it = _clients.find(fd);
+			message.prefix = it->second.getNick();
+		}
+		const std::string	cmds[5] = {"JOIN", "KICK", "INVITE", "TOPIC", "MODE"};
+		void	(Server::*funcs[5])(t_message message) = {&Server::join, &Server::kick, &Server::invite, &Server::topic, &Server::mode};
+		int	i = 0;
+		while (i < 5)
+		{
+			if (message.cmd == cmds[i])
+			{
+				(this->*funcs[i])(message);
+				return ;
+			}
+			i++;
+		}
+		std::cout << "Invalid command\n";
+		return ;
 	}
 }
 int	skipwhitespace(std::string str)

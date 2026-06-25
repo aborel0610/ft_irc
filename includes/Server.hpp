@@ -21,6 +21,7 @@ typedef	struct s_message
 	std::string	prefix;
 	std::string	cmd;
 	std::string	args[15];
+	int			fd;
 }	t_message;
 
 class Server
@@ -53,13 +54,13 @@ public:
 	void		clearClient(int fd);
 
 	//Member commands
-	void	join();
+	void	join(t_message message);
 	
 	//Channel operator commands
-	void	kick();
-	void	invite();
-	void	topic();
-	void	mode();
+	void	kick(t_message message);
+	void	invite(t_message message);
+	void	topic(t_message message);
+	void	mode(t_message message);
 };
 
 Server::Server(/* args */)

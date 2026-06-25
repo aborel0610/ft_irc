@@ -1,26 +1,26 @@
 #include "../includes/Server.hpp"
 
-void	Server::join()
+void	Server::join(t_message message)
 {
 
 }
 
-void	Server::kick()
+void	Server::kick(t_message message)
 {
 
 }
 
-void	Server::invite()
+void	Server::invite(t_message message)
 {
 
 }
 
-void	Server::topic()
+void	Server::topic(t_message message)
 {
 
 }
 
-void	Server::mode()
+void	Server::mode(t_message message)
 {
 
 }
