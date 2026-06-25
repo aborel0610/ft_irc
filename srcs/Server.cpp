@@ -84,6 +84,47 @@ void	Server::receiveData(int fd)
 	else
 	{
 		buff[bytes] = 0;
-		//Process command here
+		t_message message = parse_message(buff);
+		//Check prefix is real
+	}
+}
+int	skipwhitespace(std::string str)
+{
+	int	i = 0;
+	while (isspace(str[i]))
+		i++;
+	return i;
+}
+t_message	Server::parse_message(char* buff)
+{
+	t_message message;
+
+	int		i = 0;
+	int		pos;
+	std::string	str = (std::string)buff;
+
+	std::memset(message.args, 0, sizeof(message.args));
+	if (buff[i] == ':')
+	{
+		i++;
+		pos = i;
+		while (str[pos] && !isspace(str[pos]))
+			pos++;
+		message.prefix = str.substr(1, pos - 2);
+		i = skipwhitespace(&str[pos]);
+	}
+	pos = i;
+	while (str[pos] && !isspace(str[pos]))
+		pos++;
+	message.cmd = str.substr(i, pos - i - 1);
+	i = skipwhitespace(&str[pos]);
+	for (int j = 0; j < 15; j++)
+	{
+		while (str[pos] && !isspace(str[pos]))
+			pos++;
+		message.args[j] = str.substr(i, pos - i - 1);
+		if (str[pos] == 0)
+			break;
+		i = skipwhitespace(&str[pos]);
 	}
 }

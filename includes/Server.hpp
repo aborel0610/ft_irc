@@ -2,6 +2,7 @@
 # define SERVER_HPP
 
 # include <cstring>
+# include <string>
 # include <iostream>
 # include <map>
 # include "Client.hpp"
@@ -13,6 +14,14 @@
 # include <cstdlib>
 # include <fcntl.h>
 # include <poll.h>
+# include <cctype>
+
+typedef	struct s_message
+{
+	std::string	prefix;
+	std::string	cmd;
+	std::string	args[15];
+}	t_message;
 
 class Server
 {
@@ -30,12 +39,13 @@ public:
 	~Server();
 
 	//Member functions
-	void	init();
-	void	run();
-	void	acceptClient();
-	void	receiveData(int fd);
-	void	sendtoClient();
-	void	broadcastToChannel();
+	void		init();
+	void		run();
+	void		acceptClient();
+	void		receiveData(int fd);
+	void		sendtoClient();
+	void		broadcastToChannel();
+	t_message	parse_message(char *buff);
 
 	//Signal Handler + clean exit
 	static void	signalHandler(int signum);
