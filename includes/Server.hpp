@@ -41,6 +41,15 @@ public:
 	static void	signalHandler(int signum);
 	void		closeFds();
 	void		clearClient(int fd);
+
+	//Member commands
+	void	join();
+	
+	//Channel operator commands
+	void	kick();
+	void	invite();
+	void	topic();
+	void	mode();
 };
 
 Server::Server(/* args */)
